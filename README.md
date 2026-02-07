@@ -1,4 +1,4 @@
-# Demo of Automated Landing Page Optimization with a Multi-Armed Bandit RL Agent 
+# Automated Landing Page Optimization with a Multi-Armed Bandit Agent : A Demo
 
 This repository showcases a multi-armed bandit RL agent for automating landing-page optimization through version testing. This simple demo illustrates how the agent learns through exploration and exploitation to favor the higher-converting variant, serving as an intuitive, practical introduction to RL concepts applied to real-world A/B testing scenarios.
 
@@ -13,8 +13,8 @@ ________________________________________________________________________________
 _______________________________________________________________________________________________________________
 
 
-# Demo
-<img width="1314" height="630" alt="Image" src="https://github.com/user-attachments/assets/3d08b8ba-b9e6-43e3-ad70-e7e575757e66" />
+# MAB for Landing Pages Demo
+<img width="1238" height="520" alt="Image" src="https://github.com/user-attachments/assets/a694e396-2759-473a-841f-85bb9484fa3e" />
 
 
 
