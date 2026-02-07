@@ -1,4 +1,5 @@
-# Automating A/B Testing with Multi-Armed Bandit : A Demo
+# Automating A/B Testing with Multi-Armed Bandit  -
+# An Interactive Demo
 
 This repository showcases a multi-armed bandit RL agent for automating landing-page optimization through version testing. This simple demo illustrates how the agent learns through exploration and exploitation to favor the higher-converting variant, serving as an intuitive, practical introduction to RL concepts applied to real-world A/B testing scenarios.
 
