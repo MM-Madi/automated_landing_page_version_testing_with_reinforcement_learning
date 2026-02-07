@@ -9,7 +9,7 @@ This repository showcases a multi-armed bandit RL agent for automating landing-p
 
 **Multi-Armed Bandit (MAB)** is a self-learning optimization algorithm that is able to compare different options on a specific metric and reach a decision as to which one gives the best results. MAB is a part of the broader field of Reinforcement Learning (RL), which, among other things, offers an automated way to optimize landing pages. Here the MAB continuously experiments online with the different LP versions, tracks user responses (such as conversion), and dynamically allocates traffic to the designs that are performing better in real time, learning and adapting as data comes in. It fully automates the process of A/B testing end-to-end, allowing businesses to maximize conversions faster while minimizing lost opportunities from underperforming pages.
 
-
+<img width="1024" height="1024" alt="Image" src="https://github.com/user-attachments/assets/61b8844f-7ef3-4969-a9e1-c45abfe786a4" />
 
 
 ## MAB for Landing Pages Demo
