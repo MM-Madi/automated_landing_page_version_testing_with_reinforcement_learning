@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi Armed Bandit Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      background: #e8e8e6;
+      color: #2c2c2c;
+    }
+    h1 {
+      margin: 0.5rem 0 1rem;
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+    .intro {
+      max-width: 640px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+      color: #444;
+    }
+    .intro p {
+      margin: 0 0 1rem;
+    }
+    .intro p:last-child {
+      margin-bottom: 0;
+    }
+    .start-wrap {
+      margin: 2rem 0;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .btn-start {
+      background: #fff;
+      color: #0d9488;
+      border: 2px solid #0d9488;
+    }
+    .demo-area {
+      width: 100%;
+      max-width: 1200px;
+      display: none;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: 1rem;
+    }
+    .demo-area.visible { display: flex; }
+    .demo-left {
+      flex: 1 1 60%;
+      min-width: 280px;
+      max-width: 100%;
+    }
+    .demo-right {
+      flex: 1 1 calc(40% - 1rem);
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: stretch;
+    }
+    .graph-frame {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border: 2px solid #0d9488;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .landing-wrapper {
+      width: 100%;
+      aspect-ratio: 16/10;
+      max-height: 75vh;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    }
+    .landing {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+    }
+    .landing.day {
+      background: linear-gradient(180deg,
+        rgba(0,0,0,0.15) 0%,
+        rgba(0,0,0,0.25) 50%,
+        rgba(0,0,0,0.75) 100%
+      ), url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80") center/cover;
+      color: #fff;
+    }
+    .landing.night {
+      background: linear-gradient(180deg,
+        rgba(0,0,0,0.2) 0%,
+        rgba(0,0,0,0.4) 50%,
+        rgba(0,0,0,0.8) 100%
+      ), url("https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200&q=80") center/cover;
+      color: #fff;
+    }
+    .landing-text {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: clamp(1.35rem, 3.5vw, 2rem);
+      font-weight: 800;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .landing-sub {
+      margin: 0.35rem 0 1rem;
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      opacity: 0.98;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+    .actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-book {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      color: #fff;
+    }
+    .btn-not {
+      background: linear-gradient(135deg, #455a64, #37474f);
+      color: #fff;
+    }
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .graph-container {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 0.75rem;
+      min-height: 220px;
+    }
+    .graph-container h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #333;
+    }
+    .graph-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-height: 240px;
+    }
+    .graph-title-box {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+      background: #fafafa;
+      border-top: 1px solid #eee;
+    }
+    .graph-counters {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+      color: #555;
+      text-align: center;
+      padding: 0.5rem 0.75rem;
+      border-top: 1px solid #eee;
+    }
+    .graph-counters span { font-weight: 600; }
+    .graph-counters .label-sunset { color: #e67e22; }
+    .graph-counters .label-day { color: #3498db; }
+  </style>
+</head>
+<body>
+  <h1>Multi Armed Bandit Demo</h1>
+
+  <section class="intro" id="intro">
+    <p>This demo simulates how a Multi-Armed Bandit interacts with multiple users visiting the same landing page and interact with it.</p>
+    <p>Once you start the demo you will be presented with one version of the landing page with the option to click <strong>Book</strong> or <strong>Not Interested</strong>. Each time you make a choice, the page refreshes to represent a new visitor.</p>
+    <p>To get a feel for the learning process: start by clicking randomly. Then pick one version to simulate as the better one (higher conversion rate) and click <strong>Book</strong> for that version and <strong>Not Interested</strong> for the other. Once the agent picks up that one version performs better, it will start showing it more often.</p>
+  </section>
+
+  <div class="start-wrap">
+    <button type="button" class="btn btn-start" id="startBtn">Start the Demo</button>
+  </div>
+  <div class="demo-area" id="demoArea">
+    <div class="demo-left">
+      <div class="landing-wrapper">
+        <div class="landing day" id="landing" role="img" aria-label="Holiday landing page">
+          <p class="landing-text">Your Dream Holiday to Unicorn Beach</p>
+          <p class="landing-sub">All inclusive + flights for only $399. Limited spots — book now.</p>
+          <div class="actions">
+            <button type="button" class="btn btn-book" id="bookBtn">Book</button>
+            <button type="button" class="btn btn-not" id="notBtn">Not Interested</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-right">
+      <div class="graph-frame">
+        <div class="graph-container">
+          <h3>Conversion rate over visitors</h3>
+          <svg class="graph-svg" id="graphSvg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+            <line x1="40" y1="20" x2="40" y2="180" stroke="#999" stroke-width="1"/>
+            <line x1="40" y1="180" x2="310" y2="180" stroke="#999" stroke-width="1"/>
+            <text x="16" y="26" font-size="10" fill="#666">1</text>
+            <text x="22" y="100" font-size="10" fill="#666">0.5</text>
+            <text x="28" y="178" font-size="10" fill="#666">0</text>
+            <g id="graphLines"></g>
+            <g id="graphDots"></g>
+          </svg>
+        </div>
+        <div class="graph-counters" id="graphCounters">
+          <span class="label-sunset">Sunset-Version:</span> <span id="countDay">0</span> visitors &nbsp;|&nbsp; <span class="label-day">Day-Version:</span> <span id="countNight">0</span> visitors
+        </div>
+        <div class="graph-title-box">Agent Learning Graph</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "/api";
+    const startBtn = document.getElementById("startBtn");
+    const demoArea = document.getElementById("demoArea");
+    const landing = document.getElementById("landing");
+    const bookBtn = document.getElementById("bookBtn");
+    const notBtn = document.getElementById("notBtn");
+    const graphLines = document.getElementById("graphLines");
+    const graphDots = document.getElementById("graphDots");
+    const countDayEl = document.getElementById("countDay");
+    const countNightEl = document.getElementById("countNight");
+
+    const GRAPH = { xMin: 40, xMax: 310, yMin: 20, yMax: 180, xRange: 270, yRange: 160 };
+
+    let currentVersion = null;
+    const visitHistory = [];
+
+    function setVersion(version) {
+      currentVersion = version;
+      landing.classList.remove("day", "night");
+      landing.classList.add(version);
+    }
+
+    function setLoading(on) {
+      demoArea.classList.toggle("loading", on);
+    }
+
+    function conversionRates() {
+      const rateDay = [], rateNight = [];
+      let dayBooks = 0, dayShows = 0, nightBooks = 0, nightShows = 0;
+      for (let i = 0; i < visitHistory.length; i++) {
+        const v = visitHistory[i];
+        if (v.version === "day") {
+          dayShows++;
+          if (v.action === "book") dayBooks++;
+          rateDay.push(dayBooks / dayShows);
+          rateNight.push(rateNight[rateNight.length - 1] ?? 0);
+        } else {
+          nightShows++;
+          if (v.action === "book") nightBooks++;
+          rateNight.push(nightBooks / nightShows);
+          rateDay.push(rateDay[rateDay.length - 1] ?? 0);
+        }
+      }
+      return { rateDay, rateNight };
+    }
+
+    function xScale(i, n) {
+      if (n <= 0) return GRAPH.xMin;
+      return GRAPH.xMin + (i / n) * GRAPH.xRange;
+    }
+    function yScale(rate) {
+      return GRAPH.yMax - rate * GRAPH.yRange;
+    }
+
+    function updateGraph() {
+      const n = visitHistory.length;
+      const { rateDay, rateNight } = conversionRates();
+      graphLines.innerHTML = "";
+      graphDots.innerHTML = "";
+      if (n === 0) return;
+
+      const pathDay = ["M", GRAPH.xMin, yScale(0)];
+      const pathNight = ["M", GRAPH.xMin, yScale(0)];
+      for (let i = 0; i < n; i++) {
+        const x = xScale(i + 1, n);
+        pathDay.push("L", x, yScale(rateDay[i]));
+        pathNight.push("L", x, yScale(rateNight[i]));
+      }
+      const lineDay = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      lineDay.setAttribute("d", pathDay.join(" "));
+      lineDay.setAttribute("fill", "none");
+      lineDay.setAttribute("stroke", "#e67e22");
+      lineDay.setAttribute("stroke-width", "2");
+      lineDay.setAttribute("stroke-linecap", "round");
+      lineDay.setAttribute("stroke-linejoin", "round");
+      const lineNight = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      lineNight.setAttribute("d", pathNight.join(" "));
+      lineNight.setAttribute("fill", "none");
+      lineNight.setAttribute("stroke", "#3498db");
+      lineNight.setAttribute("stroke-width", "2");
+      lineNight.setAttribute("stroke-linecap", "round");
+      lineNight.setAttribute("stroke-linejoin", "round");
+      graphLines.appendChild(lineNight);
+      graphLines.appendChild(lineDay);
+
+      for (let i = 0; i < n; i++) {
+        const x = xScale(i + 1, n);
+        const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("cx", x);
+        dot.setAttribute("cy", visitHistory[i].version === "day" ? yScale(rateDay[i]) : yScale(rateNight[i]));
+        dot.setAttribute("r", "3");
+        dot.setAttribute("fill", visitHistory[i].version === "day" ? "#e67e22" : "#3498db");
+        dot.setAttribute("stroke", "#fff");
+        dot.setAttribute("stroke-width", "1");
+        graphDots.appendChild(dot);
+      }
+    }
+
+    function updateCounters() {
+      const day = visitHistory.filter(v => v.version === "day").length;
+      const night = visitHistory.filter(v => v.version === "night").length;
+      countDayEl.textContent = day;
+      countNightEl.textContent = night;
+    }
+
+    async function startDemo() {
+      document.getElementById("intro").style.display = "none";
+      startBtn.style.display = "none";
+      demoArea.classList.add("visible");
+      setLoading(true);
+      try {
+        const res = await fetch(API + "/visit", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+        const data = await res.json();
+        if (data.version) setVersion(data.version);
+        else setVersion(Math.random() < 0.5 ? "day" : "night");
+      } catch (e) {
+        console.error(e);
+        setVersion(Math.random() < 0.5 ? "day" : "night");
+      }
+      setLoading(false);
+    }
+
+    async function sendFeedback(action) {
+      const versionShown = currentVersion;
+      if (!versionShown) return;
+      setLoading(true);
+      visitHistory.push({ version: versionShown, action: action === "book" ? "book" : "not_interested" });
+      updateGraph();
+      updateCounters();
+      try {
+        const res = await fetch(API + "/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ version: versionShown, action: action === "book" ? "book" : "not_interested" }),
+        });
+        const data = await res.json();
+        if (data.nextVersion) setVersion(data.nextVersion);
+        else setVersion(Math.random() < 0.5 ? "day" : "night");
+      } catch (e) {
+        console.error(e);
+        setVersion(Math.random() < 0.5 ? "day" : "night");
+      }
+      setLoading(false);
+    }
+
+    startBtn.addEventListener("click", startDemo);
+    bookBtn.addEventListener("click", () => sendFeedback("book"));
+    notBtn.addEventListener("click", () => sendFeedback("not_interested"));
+  </script>
+</body>
+</html>
