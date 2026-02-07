@@ -1,12 +1,24 @@
-# Demo of Automated Landing Page Optimization / Automated Version Testing - with RL-Multi-Armed Bandits
+# Demo of Automated Landing Page Optimization with a Multi-Armed Bandit RL Agent 
 
-This repository showcases a multi-armed bandit RL agent for automating landing-page version testing. This simple demo illustrates how the agent learns through exploration and exploitation to favor higher-converting variants, serving as an intuitive, practical introduction to RL concepts applied to real-world A/B testing scenarios.
+This repository showcases a multi-armed bandit RL agent for automating landing-page optimization through version testing. This simple demo illustrates how the agent learns through exploration and exploitation to favor the higher-converting variant, serving as an intuitive, practical introduction to RL concepts applied to real-world A/B testing scenarios.
+
+_______________________________________________________________________________________________________________
+
+# Definitions
+
+**Landing page (LP) version testing** is the practice of comparing different designs or content layouts of a website’s landing page to see which one drives more conversions. This is traditionally done through A/B Testing. The business problem it addresses is uncertainty about which page layout will maximize customer actions—like sign-ups, purchases, or leads—so companies can invest confidently in the version that delivers the best results, allowing them to optimize their website on a target metric.
+
+**Multi-Armed Bandit (MAB)** is a self-learning optimization algorithm that is able to compare different options on a specific metric and reach a decision as to which one gives the best results. MAB is a part of the broader field of Reinforcement Learning (RL), which, among other things, offers an automated way to optimize landing pages. Here the MAB continuously experiments online with the different LP versions, tracks user responses (such as conversion), and dynamically allocates traffic to the designs that are performing better in real time, learning and adapting as data comes in. It fully automates the process of A/B testing end-to-end, allowing businesses to maximize conversions faster while minimizing lost opportunities from underperforming pages.
+
+_______________________________________________________________________________________________________________
+
+
+# Demo
 
 
 
 
-# Multi-Armed Bandit Demo
-This repo conatins a demonstration of an **Epsilon-Greedy Multi-Armed Bandit** used for version testing of a landing page. The frontend simulates visitors seeing different variants (Sunset Vs Day); the backend agent chooses which variant to show and learns which version is better from user actions - click on "Book" or "Not Interested".
+This repo contains a demonstration of an **Epsilon-Greedy Multi-Armed Bandit** used for version testing of a landing page. The frontend simulates visitors seeing different variants (sunset vs. day); the backend agent chooses which variant to show and learns which version is better from user actions (clicking on "Book" or "Not Interested").
 
 ## Setup
 ```bash
