@@ -1,3 +1,37 @@
 # Demo of Automated Landing Page Optimization / Automated Version Testing - with RL-Multi-Armed Bandits
 
-This repository showcases a multi-armed bandit RL agent for automating landing-page version testing. A simple demo illustrates how the agent learns through exploration and exploitation to favor higher-converting variants, serving as an intuitive, practical introduction to RL concepts applied to real-world A/B testing scenarios.
+This repository showcases a multi-armed bandit RL agent for automating landing-page version testing. This simple demo illustrates how the agent learns through exploration and exploitation to favor higher-converting variants, serving as an intuitive, practical introduction to RL concepts applied to real-world A/B testing scenarios.
+
+
+
+
+# Multi-Armed Bandit Demo
+This repo conatins a demonstration of an **Epsilon-Greedy Multi-Armed Bandit** used for version testing of a landing page. The frontend simulates visitors seeing different variants (Sunset Vs Day); the backend agent chooses which variant to show and learns which version is better from user actions - click on "Book" or "Not Interested".
+
+## Setup
+```bash
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+## Run the app
+From the project root, with the virtual environment activated:
+
+```bash
+cd backend && python app.py
+```
+
+Then open **http://127.0.0.1:5000** in your browser.
+
+## How it works
+- The **Frontend** Starts with a short explanation about the demo and a “Start the Demo” button. Once clicked an image with one version of the laning page appears with the two possible buttons **Book** and **Not Interested**, and next to it a graph showing the learning proccess of the agent. 
+- The image has two variants differing in the background photo: Sunset and Day-Time. Once the 'First Visitor' makes a choice (By clicking one of the buttons) the page is refreshed - The graph gets updated according to the choice and the next version chosen by the agent appears. This now represents what a 'Second user' sees, and with each click the simulation continues to demonstrates the cumulative interaction and learning from multiple visitors.
+- The **Backend:** includes a single Epsilon-Greedy agent with ε = 10%. It compares two arms: `day` and `night` for the corresponding versions of the landing page. 
+- Each time the agent gets a signel that a new visitor 'arrived' it chooses a version to be presented in accordance with its algorythem - The first 10 visitors will always see 5 times each version but these can appear randomly. After the first 10 trials the agent starts displaying the version with the better conversion rate 90% of the times and the other one 10% of the times, in accordance with the Exploration-Exploitation principle.
+- The counters for the versions get updated with each visitors. The conversion rate per version gets updated as well with a Reward = 1 for a “Book” click and 0 for a “Not Interested” click. The agent picks the next version to display after each feedback.
+- To get a good feeling of the agent's learning proccess its recommended to start with random clicks then choose one version as the 'better one' then start clicking on it selectively and see the effect on the agent's behavior.
+
+## API
+- `POST /api/visit` — New visitor; returns `{ "version": "day" | "night" }`.
+- `POST /api/feedback` — Body: `{ "version": "day"|"night", "action": "book"|"not_interested" }`. Returns `{ "nextVersion", "agentState" }`.
